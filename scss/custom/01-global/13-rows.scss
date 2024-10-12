@@ -1,0 +1,28 @@
+.row{
+  margin-left: - map-get($container-paddings, 'sm');
+  margin-right: - map-get($container-paddings, 'sm');
+}
+
+@include media-breakpoint-up(md) {
+  .row{
+    margin-left: - map-get($container-paddings, 'md');
+    margin-right: - map-get($container-paddings, 'md');
+
+    &.row-30{
+      margin-left: -15px !important;
+      margin-right: -15px !important;
+
+      > *{
+        padding-left: 15px !important;
+        padding-right: 15px !important;
+      }
+    }
+  }
+}
+
+@include media-breakpoint-up(lg) {
+  .row{
+    margin-left: - map-get($container-paddings, 'lg');
+    margin-right: - map-get($container-paddings, 'lg');
+  }
+}
