@@ -1,0 +1,61 @@
+#system-info{
+  .info-wrapper{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    border: 1px solid gray;
+    padding: 15px;
+
+    h2{
+      width: 100%;
+      margin-bottom: 0;
+    }
+
+    .info{
+      padding: 10px;
+      flex-grow: 1;
+      border: 1px solid gray;
+    }
+
+    .firmware{
+      width: 100%;
+    }
+
+    .ram,
+    .hdd{
+      display: flex;
+      gap: 0 10px;
+      width: 100%;
+
+      .ram-used,
+      .hdd-used{
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-grow: 1;
+
+        .progress{
+          width: 100%;
+          @include rem(11);
+          height: 14px;
+        }
+      }
+    }
+  }
+}
+
+
+@include media-breakpoint-up(md) {
+  #system-info{
+    .info-wrapper{
+      .firmware{
+        width: inherit;
+      }
+
+      .ram,
+      .hdd{
+        width: calc(50% - 10px);
+      }
+    }
+  }
+}

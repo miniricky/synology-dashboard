@@ -26,9 +26,9 @@
 @import 'custom/01-global/98-footer';
 
 /**
- * External Libraries.
- */
-
-/**
  * 02-components.
  */
+@import 'custom/02-components/00-login';
+@import 'custom/02-components/01-system-info';
+@import 'custom/02-components/02-packages-info';
+@import 'custom/02-components/03-download-station';

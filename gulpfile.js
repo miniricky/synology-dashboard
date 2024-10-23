@@ -1,14 +1,14 @@
-var gulp              = require('gulp');
-var concat            = require('gulp-concat');
-var twig              = require('gulp-twig');
-var htmlbeautify      = require('gulp-html-beautify');
-var cleancss          = require('gulp-clean-css')
-var removeSourcemaps  = require('gulp-remove-sourcemaps');
-var rename            = require("gulp-rename");
-var sass              = require('gulp-sass')(require('sass'));
-var sourcemaps        = require('gulp-sourcemaps');
-var uglify            = require('gulp-uglify');
-var w3cValidation     = require('gulp-w3c-html-validation');
+var gulp = require('gulp');
+var concat = require('gulp-concat');
+var twig = require('gulp-twig');
+var htmlbeautify = require('gulp-html-beautify');
+var cleancss = require('gulp-clean-css');
+var removeSourcemaps = require('gulp-remove-sourcemaps');
+var rename = require("gulp-rename");
+var sass = require('gulp-sass')(require('sass'));
+var sourcemaps = require('gulp-sourcemaps');
+var uglify = require('gulp-uglify');
+var w3cValidation = require('gulp-w3c-html-validation');
 
 // Global options.
 var htmlbeautify_options = {
@@ -19,18 +19,25 @@ var htmlbeautify_options = {
 
 var js_scripts = [
   './node_modules/bootstrap/dist/js/bootstrap.bundle.min.js',
-  './node_modules/jquery/dist/jquery.min.js'
+  './node_modules/jquery/dist/jquery.min.js',
+  './js-src/system-info.js',
+  './js-src/packages-info.js',
+  './js-src/download-station.js',
+  './js-src/verify-sid.js',
+  './js-src/login.js'
 ];
 
 gulp.task('sass', function () {
   return gulp.src('./scss/style.scss')
+    .pipe(sourcemaps.init())
     .pipe(sass({
-      mplementation: require('sass'),
+      implementation: require('sass'),
       quietDeps: true,
       silenceDeprecations: ['legacy-js-api']
     }).on('error', sass.logError))
     .pipe(cleancss())
     .pipe(rename('style.min.css'))
+    .pipe(sourcemaps.write('./'))
     .pipe(gulp.dest('./css'));
 });
 
@@ -69,8 +76,10 @@ gulp.task('watch', function () {
 
 gulp.task('js', function () {
   return gulp.src(js_scripts)
+    .pipe(sourcemaps.init())
     .pipe(concat('scripts-all.min.js'))
     .pipe(uglify())
+    .pipe(sourcemaps.write('./'))
     .pipe(gulp.dest('./js/'));
 });
 

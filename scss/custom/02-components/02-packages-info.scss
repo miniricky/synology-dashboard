@@ -1,0 +1,46 @@
+#packages-info{
+  .package-wrapper{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    border: 1px solid gray;
+    padding: 15px;
+
+    h2{
+      width: 100%;
+      margin: 0;
+    }
+
+    .package{
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px;
+      flex-grow: 1;
+      border: 1px solid gray;
+
+      .image{
+        width: 64px;
+
+        img{
+          width: 100%;
+          height: auto;
+        }
+      }
+
+      &.Apache2\.4,
+      &.Node\.js_v14,
+      &.Node\.js_v16,
+      &.Node\.js_v18,
+      &.Node\.js_v20{
+        .image{
+          padding: 5px;
+
+          img{
+            background-color: white;
+          }
+        }
+      }
+    }
+  }
+}

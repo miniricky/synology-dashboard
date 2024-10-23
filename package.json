@@ -1,5 +1,5 @@
 {
-  "name": "web-template",
+  "name": "synology-dashboard",
   "version": "1.0.0",
   "description": "A bootstrap5 starter web template",
   "main": "gulpfile.js",
@@ -8,20 +8,21 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:miniricky/web-template.git"
+    "url": "git@github.com:miniricky/synology-dashboard.git"
   },
   "author": "Miniricky",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/miniricky/web-template/issues"
+    "url": "https://github.com/miniricky/synology-dashboard/issues"
   },
-  "homepage": "https://github.com/miniricky/web-template#readme",
+  "homepage": "https://github.com/miniricky/synology-dashboard#readme",
   "dependencies": {
     "bootstrap": "^5.3.3",
+    "cors": "^2.8.5",
     "gulp": "^5.0.0",
+    "gulp-clean-css": "^4.3.0",
     "gulp-concat": "^2.6.1",
     "gulp-html-beautify": "^1.0.1",
-    "gulp-clean-css": "^4.3.0",
     "gulp-remove-sourcemaps": "^1.0.5",
     "gulp-rename": "^2.0.0",
     "gulp-sass": "^5.1.0",
@@ -32,7 +33,7 @@
     "gulp-w3c-html-validation": "0.0.1",
     "jquery": "^3.7.1",
     "mouseover_detect": "^1.0.0",
+    "puppeteer": "^20.3.0",
     "sass": "^1.79.4"
-  },
-  "devDependencies": {}
+  }
 }
