@@ -18,7 +18,7 @@
 
       const scraping = modal.querySelector('#initScraping');
       scraping.addEventListener('click', function () {
-        scrapingFLV(modal);
+        scrapingPagination(modal);
       });
 
       /*
@@ -36,9 +36,11 @@
                 callback(null, responseData);
               } catch (e) {
                 callback(e, null);
+                console.log(e + null);
               }
             } else {
               callback(new Error('Error in AJAX request: ' + xhr.statusText), null);
+              console.log(xhr.statusText);
             }
           }
         };
@@ -46,13 +48,172 @@
       }
 
       /*
+      * Function for scraping pagination.
+      */
+      function scrapingPagination(modal) {
+        const data = `info=scraping-pagination`;
+        createXHR('../includes/download-station.php', data, function (err, responseData) {
+          createPagination(modal, responseData.pagination.pages)
+          addSearch(modal);
+          scrapingFLV(modal, '1');
+        });
+      }
+
+      /*
+      * Function for create pagination.
+      */
+      let currentPage = 1;
+      const visibleButtons = 11;
+      const sideButtons = Math.floor(visibleButtons / 2);
+
+      function createPagination(modal, totalPages) {
+        setupPagination(modal, totalPages);
+      }
+
+      /*
+      * Function to configure pagination
+      */
+      function setupPagination(modal, totalPages) {
+        const wrapper = modal.querySelector('.row');
+        const pagination = document.createElement('div');
+        pagination.classList.add('pagination-row');
+
+        const nav = document.createElement('nav');
+        nav.setAttribute('aria-label', 'Page navigation');
+        pagination.appendChild(nav);
+
+        const ul = document.createElement('ul');
+        ul.classList.add('pagination');
+        nav.appendChild(ul);
+
+        // Botón "Previous"
+        const prevLi = document.createElement('li');
+        prevLi.classList.add('page-item');
+        if (currentPage === 1) prevLi.classList.add('disabled');
+
+        const prevAnchor = document.createElement('a');
+        prevAnchor.classList.add('page-link');
+        prevAnchor.textContent = 'Previous';
+        prevAnchor.href = '#';
+        prevLi.appendChild(prevAnchor);
+        prevLi.addEventListener('click', () => {
+          if (currentPage > 1) {
+            currentPage--;
+            updatePagination(modal, wrapper, totalPages);
+          }
+        });
+        ul.appendChild(prevLi);
+
+        // Dynamic range of buttons
+        let startPage = Math.max(1, currentPage - sideButtons);
+        let endPage = Math.min(totalPages, currentPage + sideButtons);
+
+        if (endPage - startPage < visibleButtons - 1) {
+          if (currentPage <= sideButtons) {
+            endPage = Math.min(totalPages, visibleButtons);
+          } else if (currentPage > totalPages - sideButtons) {
+            startPage = Math.max(1, totalPages - visibleButtons + 1);
+          }
+        }
+
+        // Ellipsis and home button (if there are more pages before the first visible button)
+        if (startPage > 1) {
+          const firstLi = paginationButton(1, modal, wrapper, totalPages);
+          ul.appendChild(firstLi);
+
+          const ellipsisLi = document.createElement('li');
+          ellipsisLi.classList.add('page-item', 'disabled');
+          const ellipsisAnchor = document.createElement('a');
+          ellipsisAnchor.classList.add('page-link');
+          ellipsisAnchor.textContent = '...';
+          ellipsisLi.appendChild(ellipsisAnchor);
+          ul.appendChild(ellipsisLi);
+        }
+
+        // Dynamic pagination buttons
+        for (let i = startPage; i <= endPage; i++) {
+          const li = paginationButton(i, modal, wrapper, totalPages);
+          ul.appendChild(li);
+        }
+
+        // Ellipsis and end button (if there are more pages after the last visible button)
+        if (endPage < totalPages - 1) {
+          const ellipsisLi = document.createElement('li');
+          ellipsisLi.classList.add('page-item', 'disabled');
+          const ellipsisAnchor = document.createElement('a');
+          ellipsisAnchor.classList.add('page-link');
+          ellipsisAnchor.textContent = '...';
+          ellipsisLi.appendChild(ellipsisAnchor);
+          ul.appendChild(ellipsisLi);
+        }
+
+        // Last button (always visible)
+        if (endPage < totalPages) {
+          const lastLi = paginationButton(totalPages, modal, wrapper, totalPages);
+          ul.appendChild(lastLi);
+        }
+
+        // "Next" button
+        const nextLi = document.createElement('li');
+        nextLi.classList.add('page-item');
+        if (currentPage === totalPages) nextLi.classList.add('disabled');
+
+        const nextAnchor = document.createElement('a');
+        nextAnchor.classList.add('page-link');
+        nextAnchor.textContent = 'Next';
+        nextAnchor.href = '#';
+        nextLi.appendChild(nextAnchor);
+        nextLi.addEventListener('click', () => {
+          if (currentPage < totalPages) {
+            currentPage++;
+            updatePagination(modal, wrapper, totalPages);
+          }
+        });
+        ul.appendChild(nextLi);
+
+        wrapper.appendChild(pagination);
+      }
+
+      /*
+      * Function to create pagination buttons
+      */
+      function paginationButton(page, modal, wrapper, totalPages) {
+        const li = document.createElement('li');
+        li.classList.add('page-item');
+
+        const anchor = document.createElement('a');
+        anchor.classList.add('page-link');
+        anchor.textContent = page;
+        anchor.href = '#';
+        li.appendChild(anchor);
+
+        if (currentPage === page) li.classList.add('active');
+
+        // Event when a page button is clicked
+        li.addEventListener('click', () => {
+          currentPage = page;
+          updatePagination(modal, wrapper, totalPages, currentPage);
+        });
+
+        return li;
+      }
+
+      /*
+      * Function to update pagination
+      */
+      function updatePagination(modal, wrapper, totalPages) {
+        wrapper.innerHTML = '';
+        setupPagination(modal, totalPages);
+        scrapingFLV(modal, currentPage);
+      }
+
+      /*
       * Function for scraping FLV.
       */
-      function scrapingFLV(modal) {
-        const data = `info=scraping-flv`;
+      function scrapingFLV(modal, page) {
+        const data = `info=scraping-flv&page=${encodeURIComponent(page)}`;
         createXHR('../includes/download-station.php', data, function (err, responseData) {
           const wrapper = modal.querySelector('.row');
-          addSearch(modal);
           addAnime(responseData.scraping, wrapper);
 
           const inputAnime = modal.querySelector('#search-form #searchAnime');
@@ -174,8 +335,6 @@
       * Function for adding anime to markup.
       */
       function addAnime(animeList, wrapper) {
-        wrapper.innerHTML = '';
-
         animeList.forEach(anime => {
           const colDiv = document.createElement('div');
           colDiv.classList.add('anime-wrapper', 'col-12', 'col-md-4', 'col-lg-3', 'col-xl-2');

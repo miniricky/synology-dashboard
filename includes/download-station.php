@@ -8,8 +8,15 @@
     $sid = $_COOKIE['sid'];
     $domain = $_COOKIE['domain'];
 
-    if ($data == 'scraping-flv') {
+    if ($data == 'scraping-pagination') {
       $url = 'https://www3.animeflv.net/browse';
+      $pagination = scrapingPagination($url);
+      jsonEncode('pagination', $pagination);
+    }
+
+    if ($data == 'scraping-flv') {
+      $page = (int) $_POST['page'];
+      $url = 'https://www3.animeflv.net/browse?page=' . $page;
       $scraping = scrapingFLV($url);
       jsonEncode('scraping', $scraping);
     }
@@ -70,13 +77,36 @@
   }
 
   /*
+    * Function for scraping Pagination.
+    */
+  function scrapingPagination($url) {
+    $xpath = curl($url);
+    $pagination_query = "//ul[contains(@class, 'pagination')]/li[last()-1]/a/@href";
+    $pages = $xpath->query($pagination_query);
+    $pages = ($pages->length > 0) ? (int) preg_replace('/\D/', '', $pages->item(0)->nodeValue) : 1;
+
+    if ($pages) {
+      $pages = [
+        'pages' => $pages,
+        'status' => 'true'
+      ];
+    } else {
+      $pages = [
+        'status' => 'false',
+        'error' => 'Error trying to get pages'
+      ];
+    }
+
+    return $pages;
+  }
+
+  /*
     * Function for scraping FLV.
     */
   function scrapingFLV($url) {
     $xpath = curl($url);
-    $scraping = [];
-
     $articles = $xpath->query("//article");
+
     foreach ($articles as $article) {
       $titleNode = $xpath->query(".//div[contains(@class, 'Title')]", $article);
       $typeNode = $xpath->query(".//p/span[contains(@class, 'Type')]", $article);

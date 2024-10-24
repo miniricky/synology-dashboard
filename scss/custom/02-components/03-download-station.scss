@@ -20,11 +20,13 @@
 
     form#search-form{
       + *{
-        margin-top: 10px;
+        margin-top: 15px;
       }
     }
 
     .anime-wrapper{
+      content-visibility: auto;
+
       .anime{
         height: 100%;
         border: 1px solid rgba(0, 0, 0, 0.15);
@@ -113,6 +115,16 @@
         margin-top: 15px;
       }
     }
+
+    .pagination-row{
+      padding: 0 15px;
+
+      ul.pagination{
+        flex-wrap: wrap;
+        gap: 10px 0;
+        justify-content: center;
+      }
+    }
   }
 }
 
@@ -124,7 +136,7 @@
           margin-top: 0;
         }
 
-        &:nth-child(n+4){
+        &:nth-child(n+6){
           margin-top: 30px;
         }
       }
@@ -136,11 +148,11 @@
   #DownloadStation{
     .modal-body{
       .anime-wrapper{
-        &:nth-child(n+4){
+        &:nth-child(n+7){
           margin-top: 0;
         }
 
-        &:nth-child(n+5){
+        &:nth-child(n+7){
           margin-top: 30px;
         }
       }
@@ -152,11 +164,11 @@
   #DownloadStation{
     .modal-body{
       .anime-wrapper{
-        &:nth-child(n+5){
+        &:nth-child(n+7){
           margin-top: 0;
         }
 
-        &:nth-child(n+7){
+        &:nth-child(n+8){
           margin-top: 30px;
         }
       }
