@@ -15,10 +15,18 @@
     }
 
     if ($data == 'scraping-flv') {
-      $page = (int) $_POST['page'];
+      $page = $_POST['page'];
       $url = 'https://www3.animeflv.net/browse?page=' . $page;
       $scraping = scrapingFLV($url);
       jsonEncode('scraping', $scraping);
+    }
+
+    if ($data == 'scraping-search') {;
+      $value = $_POST['value'];
+      $value = str_replace(' ', '+', strtolower($value));
+      $url = 'https://www3.animeflv.net/browse?q=' . $value;
+      $anime = scrapingFLV($url);
+      jsonEncode('anime', $anime);
     }
 
     if ($data == 'scraping-episode') {

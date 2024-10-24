@@ -16,9 +16,14 @@
         sendURL(encodedUrl);
       });
 
+      let unique = 0;
       const scraping = modal.querySelector('#initScraping');
       scraping.addEventListener('click', function () {
-        scrapingPagination(modal);
+        if (unique === 0) {
+          scrapingPagination(modal);
+
+          unique++;
+        }
       });
 
       /*
@@ -55,7 +60,7 @@
         createXHR('../includes/download-station.php', data, function (err, responseData) {
           createPagination(modal, responseData.pagination.pages)
           addSearch(modal);
-          scrapingFLV(modal, '1');
+          scrapingFLV(modal, '1', responseData.pagination.pages);
         });
       }
 
@@ -204,30 +209,20 @@
       function updatePagination(modal, wrapper, totalPages) {
         wrapper.innerHTML = '';
         setupPagination(modal, totalPages);
-        scrapingFLV(modal, currentPage);
+        scrapingFLV(modal, currentPage, totalPages);
       }
 
       /*
       * Function for scraping FLV.
       */
-      function scrapingFLV(modal, page) {
+      function scrapingFLV(modal, page, totalPages) {
         const data = `info=scraping-flv&page=${encodeURIComponent(page)}`;
         createXHR('../includes/download-station.php', data, function (err, responseData) {
           const wrapper = modal.querySelector('.row');
           addAnime(responseData.scraping, wrapper);
 
           const inputAnime = modal.querySelector('#search-form #searchAnime');
-          inputAnime.addEventListener('keyup', function () {
-            const inputValue = inputAnime.value.trim();
-
-            wrapper.innerHTML = '';
-            if (inputValue.length === 0) {
-              addAnime(responseData.scraping, wrapper);
-            } else if (inputValue.length > 2) {
-              const result = searchAnime(responseData, inputValue);
-              addAnime(result, wrapper);
-            }
-          });
+          initializeSearchListener(inputAnime, modal, wrapper, totalPages);
 
           wrapper.addEventListener('click', function (e) {
             const selected = wrapper.querySelectorAll('.anime.selected');
@@ -244,6 +239,68 @@
               }
             }
           });
+        });
+      }
+
+      // Function for the keyup event
+      let isSearchCleared = false;
+      let typingTimer;
+      const typingDelay = 1000;
+      function initializeSearchListener(inputAnime, modal, wrapper, totalPages) {
+        inputAnime.removeEventListener('keyup', handleSearch);
+        inputAnime.addEventListener('keyup', handleSearch);
+
+        function handleSearch() {
+          const inputValue = inputAnime.value.trim();
+          clearTimeout(typingTimer);
+
+          typingTimer = setTimeout(() => {
+            if (inputValue.length === 0) {
+              if (!isSearchCleared) {
+                clearWrapperExceptForm(wrapper);
+                createPagination(modal, totalPages);
+                scrapingFLV(modal, currentPage, totalPages);
+                isSearchCleared = true;
+              }
+            } else if (inputValue.length > 3) {
+              scrapingSearch(inputValue, wrapper);
+              isSearchCleared = false;
+            }
+          }, typingDelay);
+        }
+      }
+
+      /*
+      * Función para limpiar el contenido del wrapper, manteniendo el formulario.
+      */
+      function clearWrapperExceptForm(wrapper) {
+          const form = wrapper.querySelector('#search-form');
+          wrapper.innerHTML = '';  // Limpia todo el contenido
+          if (form) {
+              wrapper.appendChild(form);  // Vuelve a añadir el formulario al wrapper
+          }
+      }
+
+      /*
+      * Function for remove anime without pagination.
+      */
+      function removeAnime(wrapper) {
+        const paginationDiv = wrapper.querySelector('.pagination-row');
+        Array.from(wrapper.children).forEach(child => {
+          if (child !== paginationDiv) {
+            child.remove();
+          }
+        });
+      }
+
+      /*
+      * Function for scraping search.
+      */
+      function scrapingSearch(value, wrapper) {
+        const data = `info=scraping-search&value=${encodeURIComponent(value)}`;
+        createXHR('../includes/download-station.php', data, (err, responseData) => {
+          wrapper.innerHTML = '';
+          addAnime(responseData.anime, wrapper);
         });
       }
 
@@ -292,25 +349,24 @@
       */
       function addSearch(modal) {
         const modalBody = modal.querySelector('.modal-content .modal-body');
-        const button = modal.querySelector('#initScraping');
+        const buttonScraping = modal.querySelector('#initScraping');
 
         if (!document.getElementById('search-form')) {
           const searchForm = document.createElement('form');
           searchForm.setAttribute('id', 'search-form');
-          modalBody.insertBefore(searchForm, button.nextSibling);
+          modalBody.insertBefore(searchForm, buttonScraping.nextSibling);
 
           const label = document.createElement('label');
           label.setAttribute('for', 'searchAnime');
           label.classList.add('form-label');
           label.textContent = 'Search';
+          searchForm.appendChild(label);
 
           const input = document.createElement('input');
           input.setAttribute('type', 'text');
           input.setAttribute('class', 'form-control');
           input.setAttribute('id', 'searchAnime');
           input.setAttribute('placeholder', 'Search Anime');
-
-          searchForm.appendChild(label);
           searchForm.appendChild(input);
         }
       }
